@@ -47,6 +47,7 @@
         <attr name="bpDisabledDayColor" format="color"/>
         <attr name="bpDisabledDayTextColor" format="color"/>
         <attr name="bpSelectionAlpha" format="integer"/>
+        <attr name="bpContrastTextColor" format="color"/>
     </declare-styleable>
 
     <declare-styleable name="Android">

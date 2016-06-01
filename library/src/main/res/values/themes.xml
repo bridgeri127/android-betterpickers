@@ -34,6 +34,7 @@
         <item name="bpSelectionAlpha">51</item>
         <item name="bpDisabledDayColor">@color/bp_disabled_day</item>
         <item name="bpDisabledDayTextColor">@color/circle_background</item>
+        <item name="bpContrastTextColor">@color/bpPurple</item>
     </style>
 
     <style name="BetterPickersRadialTimePickerDialog.PrimaryColor">
@@ -51,6 +52,7 @@
         <item name="bpLineColor">@color/bpLine_background</item>
         <item name="bpDoneBackgroundColor">@drawable/done_background_color</item>
         <item name="bpSelectionAlpha">51</item>
+        <item name="bpContrastTextColor">@color/bpOrange</item>
     </style>
 
     <style name="BetterPickersRadialTimePickerDialog.Dark">
@@ -62,5 +64,6 @@
         <item name="bpLineColor">@color/bpLine_dark</item>
         <item name="bpDoneBackgroundColor">@drawable/done_background_color_dark</item>
         <item name="bpSelectionAlpha">102</item>
+        <item name="bpContrastTextColor">@color/bpWhite</item>
     </style>
 </resources>

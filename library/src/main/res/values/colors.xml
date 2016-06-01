@@ -22,6 +22,8 @@
 
     <color name="bpWhite">#ffffff</color>
     <color name="bpblack">#ff000000</color>
+    <color name="bpOrange">#ff9900</color>
+    <color name="bpPurple">#cc00ff</color>
     <color name="bpLine_background">#cccccc</color>
     <color name="bpTransparent">#00000000</color>
     <color name="bpTransparent_black">#7f000000</color>
