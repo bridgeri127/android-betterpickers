@@ -23,6 +23,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Paint.Align;
 import android.graphics.Typeface;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
 
@@ -41,6 +42,7 @@ public class AmPmCirclesView extends View {
     private int mSelectedAlpha;
     private int mUnselectedColor;
     private int mAmPmTextColor;
+    private int mAmPmSelectedTextColor;
     private int mSelectedColor;
     private float mCircleRadiusMultiplier;
     private float mAmPmCircleRadiusMultiplier;
@@ -96,9 +98,10 @@ public class AmPmCirclesView extends View {
 
     /* package */
     void setTheme(TypedArray themeColors) {
-        mUnselectedColor = themeColors.getColor(R.styleable.BetterPickersDialog_bpMainColor1, R.color.bpWhite);
-        mSelectedColor = themeColors.getColor(R.styleable.BetterPickersDialog_bpAccentColor,R.color.bpBlue);
-        mAmPmTextColor = themeColors.getColor(R.styleable.BetterPickersDialog_bpMainTextColor, R.color.ampm_text_color);
+        mUnselectedColor = themeColors.getColor(R.styleable.BetterPickersDialog_bpMainColor1, ContextCompat.getColor(getContext(), R.color.bpWhite));
+        mSelectedColor = themeColors.getColor(R.styleable.BetterPickersDialog_bpAccentColor,ContextCompat.getColor(getContext(), R.color.bpBlue));
+        mAmPmTextColor = themeColors.getColor(R.styleable.BetterPickersDialog_bpMainTextColor, ContextCompat.getColor(getContext(), R.color.ampm_text_color));
+        mAmPmSelectedTextColor = themeColors.getColor(R.styleable.BetterPickersDialog_bpContrastTextColor, ContextCompat.getColor(getContext(), R.color.bpWhite));
         mSelectedAlpha = themeColors.getInt(R.styleable.BetterPickersDialog_bpSelectionAlpha, 100);
     }
 
@@ -192,9 +195,17 @@ public class AmPmCirclesView extends View {
         canvas.drawCircle(mPmXCenter, mAmPmYCenter, mAmPmCircleRadius, mPaint);
 
         // Draw the AM/PM texts on top.
-        mPaint.setColor(mAmPmTextColor);
         int textYCenter = mAmPmYCenter - (int) (mPaint.descent() + mPaint.ascent()) / 2;
-        canvas.drawText(mAmText, mAmXCenter, textYCenter, mPaint);
-        canvas.drawText(mPmText, mPmXCenter, textYCenter, mPaint);
+        if (mAmOrPm == AM) {
+            mPaint.setColor(mAmPmSelectedTextColor);
+            canvas.drawText(mAmText, mAmXCenter, textYCenter, mPaint);
+            mPaint.setColor(mAmPmTextColor);
+            canvas.drawText(mPmText, mPmXCenter, textYCenter, mPaint);
+        } else if (mAmOrPm == PM) {
+            mPaint.setColor(mAmPmSelectedTextColor);
+            canvas.drawText(mPmText, mPmXCenter, textYCenter, mPaint);
+            mPaint.setColor(mAmPmTextColor);
+            canvas.drawText(mAmText, mAmXCenter, textYCenter, mPaint);
+        }
     }
 }
