@@ -112,15 +112,15 @@ public class RadialPickerLayout extends FrameLayout implements OnTouchListener {
         mAmPmCirclesView = new AmPmCirclesView(context);
         addView(mAmPmCirclesView);
 
-        mHourRadialTextsView = new RadialTextsView(context);
-        addView(mHourRadialTextsView);
-        mMinuteRadialTextsView = new RadialTextsView(context);
-        addView(mMinuteRadialTextsView);
-
         mHourRadialSelectorView = new RadialSelectorView(context, this);
         addView(mHourRadialSelectorView);
         mMinuteRadialSelectorView = new RadialSelectorView(context, this);
         addView(mMinuteRadialSelectorView);
+
+        mHourRadialTextsView = new RadialTextsView(context);
+        addView(mHourRadialTextsView);
+        mMinuteRadialTextsView = new RadialTextsView(context);
+        addView(mMinuteRadialTextsView);
 
         // Prepare mapping to snap touchable degrees to selectable degrees.
         preparePrefer30sMap();
