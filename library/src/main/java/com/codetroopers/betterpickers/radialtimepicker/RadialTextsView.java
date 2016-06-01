@@ -22,7 +22,10 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Paint.Align;
+import android.graphics.Path;
+import android.graphics.Region;
 import android.graphics.Typeface;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
 
@@ -76,6 +79,10 @@ public class RadialTextsView extends View {
     ObjectAnimator mReappearAnimator;
     private InvalidateUpdateListener mInvalidateUpdateListener;
 
+    private int mSelectedTextColor;
+    private int mNumbersTextColor;
+    private Path mSelectorPath;
+
     public RadialTextsView(Context context) {
         super(context);
         mIsInitialized = false;
@@ -115,8 +122,8 @@ public class RadialTextsView extends View {
         }
 
         // Initialize the widths and heights of the grid, and calculate the values for the numbers.
-        mTextGridHeights = new float[7];
-        mTextGridWidths = new float[7];
+        mTextGridHeights = new float[12];
+        mTextGridWidths = new float[12];
         if (mHasInnerCircle) {
             mNumbersRadiusMultiplier = Float.parseFloat(
                     res.getString(R.string.numbers_radius_multiplier_outer));
@@ -127,8 +134,8 @@ public class RadialTextsView extends View {
             mInnerTextSizeMultiplier = Float.parseFloat(
                     res.getString(R.string.text_size_multiplier_inner));
 
-            mInnerTextGridHeights = new float[7];
-            mInnerTextGridWidths = new float[7];
+            mInnerTextGridHeights = new float[12];
+            mInnerTextGridWidths = new float[12];
         } else {
             mNumbersRadiusMultiplier = Float.parseFloat(
                     res.getString(R.string.numbers_radius_multiplier_normal));
@@ -146,7 +153,8 @@ public class RadialTextsView extends View {
     }
 
     /* package */ void setTheme(TypedArray themeColors) {
-        mPaint.setColor(themeColors.getColor(R.styleable.BetterPickersDialog_bpMainTextColor, R.color.numbers_text_color));
+        mNumbersTextColor = themeColors.getColor(R.styleable.BetterPickersDialog_bpMainTextColor, ContextCompat.getColor(getContext(), R.color.numbers_text_color));
+        mSelectedTextColor = themeColors.getColor(R.styleable.BetterPickersDialog_bpContrastTextColor, ContextCompat.getColor(getContext(), R.color.bpWhite));
     }
 
     /**
@@ -215,10 +223,11 @@ public class RadialTextsView extends View {
         }
 
         // Draw the texts in the pre-calculated positions.
-        drawTexts(canvas, mTextSize, mTypefaceLight, mTexts, mTextGridWidths, mTextGridHeights);
+        drawTexts(canvas, mTextSize, mTypefaceLight, mTexts, mTextGridWidths,
+                mTextGridHeights, true);
         if (mHasInnerCircle) {
-            drawTexts(canvas, mInnerTextSize, mTypefaceRegular, mInnerTexts,
-                    mInnerTextGridWidths, mInnerTextGridHeights);
+            drawTexts(canvas, mInnerTextSize, mTypefaceRegular, mInnerTexts, mInnerTextGridWidths,
+                    mInnerTextGridHeights, true);
         }
     }
 
@@ -230,6 +239,8 @@ public class RadialTextsView extends View {
             float textSize, float[] textGridHeights, float[] textGridWidths) {
         /*
          * The numbers need to be drawn in a 7x7 grid, representing the points on the Unit Circle.
+         * Each numbers co-ordinates are caluclated separately even when they are the same to allow
+         * easier iterating through the values.
          */
         float offset1 = numbersRadius;
         // cos(30) = a / r => r * cos(30) = a => r * √3/2 = a
@@ -241,40 +252,71 @@ public class RadialTextsView extends View {
         yCenter -= (mPaint.descent() + mPaint.ascent()) / 2;
 
         textGridHeights[0] = yCenter - offset1;
-        textGridWidths[0] = xCenter - offset1;
         textGridHeights[1] = yCenter - offset2;
-        textGridWidths[1] = xCenter - offset2;
         textGridHeights[2] = yCenter - offset3;
-        textGridWidths[2] = xCenter - offset3;
         textGridHeights[3] = yCenter;
-        textGridWidths[3] = xCenter;
         textGridHeights[4] = yCenter + offset3;
-        textGridWidths[4] = xCenter + offset3;
         textGridHeights[5] = yCenter + offset2;
-        textGridWidths[5] = xCenter + offset2;
         textGridHeights[6] = yCenter + offset1;
-        textGridWidths[6] = xCenter + offset1;
+        textGridHeights[7] = yCenter + offset2;
+        textGridHeights[8] = yCenter + offset3;
+        textGridHeights[9] = yCenter;
+        textGridHeights[10] = yCenter - offset3;
+        textGridHeights[11] = yCenter - offset2;
+
+        textGridWidths[0] = xCenter;
+        textGridWidths[1] = xCenter + offset3;
+        textGridWidths[2] = xCenter + offset2;
+        textGridWidths[3] = xCenter + offset1;
+        textGridWidths[4] = xCenter + offset2;
+        textGridWidths[5] = xCenter + offset3;
+        textGridWidths[6] = xCenter;
+        textGridWidths[7] = xCenter - offset3;
+        textGridWidths[8] = xCenter - offset2;
+        textGridWidths[9] = xCenter - offset1;
+        textGridWidths[10] = xCenter - offset2;
+        textGridWidths[11] = xCenter - offset3;
     }
 
     /**
      * Draw the 12 text values at the positions specified by the textGrid parameters.
+     *
+     * If showing selection contrast, initially draw all numbers outside of the current value of mSelectorPath,
+     * and then recursively call drawTexts() again and draw numbers inside mSelectorPath
      */
-    private void drawTexts(Canvas canvas, float textSize, Typeface typeface, String[] texts,
-            float[] textGridWidths, float[] textGridHeights) {
+    public void drawTexts(Canvas canvas, float textSize, Typeface typeface, String[] texts, float[] textGridWidths,
+                          float[] textGridHeights, boolean showSelectionContrast) {
+
         mPaint.setTextSize(textSize);
         mPaint.setTypeface(typeface);
-        canvas.drawText(texts[0], textGridWidths[3], textGridHeights[0], mPaint);
-        canvas.drawText(texts[1], textGridWidths[4], textGridHeights[1], mPaint);
-        canvas.drawText(texts[2], textGridWidths[5], textGridHeights[2], mPaint);
-        canvas.drawText(texts[3], textGridWidths[6], textGridHeights[3], mPaint);
-        canvas.drawText(texts[4], textGridWidths[5], textGridHeights[4], mPaint);
-        canvas.drawText(texts[5], textGridWidths[4], textGridHeights[5], mPaint);
-        canvas.drawText(texts[6], textGridWidths[3], textGridHeights[6], mPaint);
-        canvas.drawText(texts[7], textGridWidths[2], textGridHeights[5], mPaint);
-        canvas.drawText(texts[8], textGridWidths[1], textGridHeights[4], mPaint);
-        canvas.drawText(texts[9], textGridWidths[0], textGridHeights[3], mPaint);
-        canvas.drawText(texts[10], textGridWidths[1], textGridHeights[2], mPaint);
-        canvas.drawText(texts[11], textGridWidths[2], textGridHeights[1], mPaint);
+
+        for (int i = 0; i < texts.length; i++) {
+
+            canvas.save();
+
+            if (mSelectorPath != null) {
+                if (showSelectionContrast) {
+                    mPaint.setColor(mSelectedTextColor);
+                    canvas.clipPath(mSelectorPath, Region.Op.REPLACE);
+                } else {
+                    mPaint.setColor(mNumbersTextColor);
+                    canvas.clipPath(mSelectorPath, Region.Op.XOR);
+                }
+            } else {
+                mPaint.setColor(mNumbersTextColor);
+            }
+
+
+            if (texts.length == textGridHeights.length && textGridHeights.length == textGridWidths.length) {
+                canvas.drawText(texts[i], textGridWidths[i], textGridHeights[i], mPaint);
+            }
+
+            canvas.restore();
+        }
+
+        if (showSelectionContrast) {
+            drawTexts(canvas, textSize, typeface, texts, textGridWidths, textGridHeights, false);
+        }
     }
 
     /**
@@ -325,6 +367,15 @@ public class RadialTextsView extends View {
                 AnimatorProxy.NEEDS_PROXY ? AnimatorProxy.wrap(this) : this, radiusReappear, fadeIn)
                 .setDuration(totalDuration);
         mReappearAnimator.addUpdateListener(mInvalidateUpdateListener);
+    }
+
+    /**
+     * Set the Path value currently occupied by the selector object, and redraw the view
+     * @param selectorPath the Path to set
+     */
+    public void setSelection(Path selectorPath) {
+        mSelectorPath = selectorPath;
+        invalidate();
     }
 
     public ObjectAnimator getDisappearAnimator() {

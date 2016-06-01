@@ -21,6 +21,8 @@ import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.Region;
 import android.util.Log;
 import android.view.View;
 
@@ -44,6 +46,7 @@ public class RadialSelectorView extends View {
     private static final int FULL_ALPHA = Utils.FULL_ALPHA;
 
     private final Paint mPaint = new Paint();
+    private final RadialPickerLayout mParent;
 
     private boolean mIsInitialized;
     private boolean mDrawValuesReady;
@@ -72,9 +75,12 @@ public class RadialSelectorView extends View {
     private double mSelectionRadians;
     private boolean mForceDrawDot;
 
-    public RadialSelectorView(Context context) {
+    private Path mSelectorPath;
+
+    public RadialSelectorView(Context context, RadialPickerLayout parent) {
         super(context);
         mIsInitialized = false;
+        mParent = parent;
     }
 
     /**
@@ -288,8 +294,17 @@ public class RadialSelectorView extends View {
 
         // Draw the selection circle.
         mPaint.setAlpha(mSelectionAlpha);
+
         canvas.drawCircle(pointX, pointY, mSelectionRadius, mPaint);
 
+        // Set up the clip path so that it can be used when drawing the number texts.
+        if (mSelectorPath == null) {
+            mSelectorPath = new Path();
+        } else {
+            mSelectorPath.reset();
+        }
+        mSelectorPath.addCircle(pointX, pointY, mSelectionRadius, Path.Direction.CCW);
+        
         if (mForceDrawDot | mSelectionDegrees % 30 != 0) {
             // We're not on a direct tick (or we've been told to draw the dot anyway).
             mPaint.setAlpha(FULL_ALPHA);
@@ -307,6 +322,8 @@ public class RadialSelectorView extends View {
         mPaint.setAlpha(255);
         mPaint.setStrokeWidth(1);
         canvas.drawLine(mXCenter, mYCenter, pointX, pointY, mPaint);
+
+        mParent.redrawRadialTextsLayouts();
     }
 
     public ObjectAnimator getDisappearAnimator() {
@@ -374,6 +391,10 @@ public class RadialSelectorView extends View {
                 .setDuration(totalDuration);
         reappearAnimator.addUpdateListener(mInvalidateUpdateListener);
         return reappearAnimator;
+    }
+
+    public Path getSelectorPath() {
+        return mSelectorPath;
     }
 
     /**

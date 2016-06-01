@@ -117,9 +117,9 @@ public class RadialPickerLayout extends FrameLayout implements OnTouchListener {
         mMinuteRadialTextsView = new RadialTextsView(context);
         addView(mMinuteRadialTextsView);
 
-        mHourRadialSelectorView = new RadialSelectorView(context);
+        mHourRadialSelectorView = new RadialSelectorView(context, this);
         addView(mHourRadialSelectorView);
-        mMinuteRadialSelectorView = new RadialSelectorView(context);
+        mMinuteRadialSelectorView = new RadialSelectorView(context, this);
         addView(mMinuteRadialSelectorView);
 
         // Prepare mapping to snap touchable degrees to selectable degrees.
@@ -138,6 +138,14 @@ public class RadialPickerLayout extends FrameLayout implements OnTouchListener {
         mAccessibilityManager = (AccessibilityManager) context.getSystemService(Context.ACCESSIBILITY_SERVICE);
 
         mTimeInitialized = false;
+    }
+
+    /**
+     * Redraw the hour and minute radial textviews
+     */
+    public void redrawRadialTextsLayouts() {
+        mHourRadialTextsView.setSelection(mHourRadialSelectorView.getSelectorPath());
+        mMinuteRadialTextsView.setSelection(mMinuteRadialSelectorView.getSelectorPath());
     }
 
     /**
@@ -197,9 +205,7 @@ public class RadialPickerLayout extends FrameLayout implements OnTouchListener {
         }
         mHourRadialTextsView.initialize(res,
                 hoursTexts, (is24HourMode ? innerHoursTexts : null), mHideAmPm, true);
-        mHourRadialTextsView.invalidate();
         mMinuteRadialTextsView.initialize(res, minutesTexts, null, mHideAmPm, false);
-        mMinuteRadialTextsView.invalidate();
 
         // Initialize the currently-selected hour and minute.
         setValueForItem(HOUR_INDEX, initialHoursOfDay);
