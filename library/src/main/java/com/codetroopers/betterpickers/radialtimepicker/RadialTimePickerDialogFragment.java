@@ -21,6 +21,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.text.format.DateFormat;
@@ -98,6 +99,7 @@ public class RadialTimePickerDialogFragment extends DialogFragment implements On
 
     private int mSelectedColor;
     private int mUnselectedColor;
+    private Typeface mTypeFace;
     private String mAmText;
     private String mPmText;
     private String mDoneText;
@@ -279,6 +281,11 @@ public class RadialTimePickerDialogFragment extends DialogFragment implements On
         return this;
     }
 
+    public RadialTimePickerDialogFragment setTypeFace(Typeface typeFace) {
+        mTypeFace = typeFace;
+        return this;
+    }
+
     /**
      * Autodetect is done by default if nothing is specified
      */
@@ -341,11 +348,19 @@ public class RadialTimePickerDialogFragment extends DialogFragment implements On
         mHourView = (TextView) view.findViewById(R.id.hours);
         mHourView.setOnKeyListener(keyboardListener);
         mHourSpaceView = (TextView) view.findViewById(R.id.hour_space);
+        mHourSpaceView.setTypeface(mTypeFace);
         mMinuteSpaceView = (TextView) view.findViewById(R.id.minutes_space);
         mMinuteView = (TextView) view.findViewById(R.id.minutes);
         mMinuteView.setOnKeyListener(keyboardListener);
         mAmPmTextView = (TextView) view.findViewById(R.id.ampm_label);
         mAmPmTextView.setOnKeyListener(keyboardListener);
+
+        if (mTypeFace != null) {
+            mHourView.setTypeface(mTypeFace);
+            mMinuteView.setTypeface(mTypeFace);
+            mAmPmTextView.setTypeface(mTypeFace);
+        }
+
         String[] amPmTexts = new DateFormatSymbols().getAmPmStrings();
         mAmText = amPmTexts[0];
         mPmText = amPmTexts[1];
@@ -355,7 +370,7 @@ public class RadialTimePickerDialogFragment extends DialogFragment implements On
         mTimePicker = (RadialPickerLayout) view.findViewById(R.id.time_picker);
         mTimePicker.setOnValueSelectedListener(this);
         mTimePicker.setOnKeyListener(keyboardListener);
-        mTimePicker.initialize(getActivity(), mHapticFeedbackController, mInitialHourOfDay, mInitialMinute, mIs24HourMode);
+        mTimePicker.initialize(getActivity(), mHapticFeedbackController, mInitialHourOfDay, mInitialMinute, mIs24HourMode, mTypeFace);
 
         int currentItemShowing = HOUR_INDEX;
         if (savedInstanceState != null && savedInstanceState.containsKey(KEY_CURRENT_ITEM_SHOWING)) {

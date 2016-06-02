@@ -87,22 +87,35 @@ public class RadialTextsView extends View {
     public RadialTextsView(Context context) {
         super(context);
         mIsInitialized = false;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            setLayerType(LAYER_TYPE_SOFTWARE, null);
+        }
     }
 
     public void initialize(Resources res, String[] texts, String[] innerTexts,
-            boolean is24HourMode, boolean disappearsOut) {
+                           boolean is24HourMode, boolean disappearsOut) {
+        initialize(res, texts, innerTexts, is24HourMode, disappearsOut, null);
+    }
+
+    public void initialize(Resources res, String[] texts, String[] innerTexts,
+            boolean is24HourMode, boolean disappearsOut, Typeface typeface) {
         if (mIsInitialized) {
             Log.e(TAG, "This RadialTextsView may only be initialized once.");
             return;
         }
 
+        // Set typeface to the given value or to the default values if no value is given
+        if (typeface != null) {
+            mTypefaceLight = typeface;
+            mTypefaceRegular = typeface;
+        } else {
+            String typefaceFamily = res.getString(R.string.radial_numbers_typeface);
+            mTypefaceLight = Typeface.create(typefaceFamily, Typeface.NORMAL);
+            String typefaceFamilyRegular = res.getString(R.string.sans_serif);
+            mTypefaceRegular = Typeface.create(typefaceFamilyRegular, Typeface.NORMAL);
+        }
+
         // Set up the paint.
-        int numbersTextColor = res.getColor(R.color.numbers_text_color);
-        mPaint.setColor(numbersTextColor);
-        String typefaceFamily = res.getString(R.string.radial_numbers_typeface);
-        mTypefaceLight = Typeface.create(typefaceFamily, Typeface.NORMAL);
-        String typefaceFamilyRegular = res.getString(R.string.sans_serif);
-        mTypefaceRegular = Typeface.create(typefaceFamilyRegular, Typeface.NORMAL);
         mPaint.setAntiAlias(true);
         mPaint.setTextAlign(Align.CENTER);
 

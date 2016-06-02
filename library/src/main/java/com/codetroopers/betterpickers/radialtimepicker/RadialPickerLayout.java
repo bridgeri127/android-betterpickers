@@ -20,6 +20,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.view.accessibility.AccessibilityManagerCompat;
@@ -171,7 +172,11 @@ public class RadialPickerLayout extends FrameLayout implements OnTouchListener {
      * Initialize the Layout with starting values.
      */
     public void initialize(Context context, HapticFeedbackController hapticFeedbackController, int initialHoursOfDay,
-            int initialMinutes, boolean is24HourMode) {
+                           int initialMinutes, boolean is24HourMode) {
+        initialize(context, hapticFeedbackController, initialHoursOfDay, initialMinutes, is24HourMode, null);
+    }
+    public void initialize(Context context, HapticFeedbackController hapticFeedbackController, int initialHoursOfDay,
+                           int initialMinutes, boolean is24HourMode, Typeface typeface) {
         if (mTimeInitialized) {
             Log.e(TAG, "Time has already been initialized.");
             return;
@@ -185,7 +190,7 @@ public class RadialPickerLayout extends FrameLayout implements OnTouchListener {
         mCircleView.initialize(context, mHideAmPm);
         mCircleView.invalidate();
         if (!mHideAmPm) {
-            mAmPmCirclesView.initialize(context, initialHoursOfDay < 12 ? AM : PM);
+            mAmPmCirclesView.initialize(context, initialHoursOfDay < 12 ? AM : PM, typeface);
             mAmPmCirclesView.invalidate();
         }
 
@@ -204,8 +209,8 @@ public class RadialPickerLayout extends FrameLayout implements OnTouchListener {
             minutesTexts[i] = String.format("%02d", minutes[i]);
         }
         mHourRadialTextsView.initialize(res,
-                hoursTexts, (is24HourMode ? innerHoursTexts : null), mHideAmPm, true);
-        mMinuteRadialTextsView.initialize(res, minutesTexts, null, mHideAmPm, false);
+                hoursTexts, (is24HourMode ? innerHoursTexts : null), mHideAmPm, true, typeface);
+        mMinuteRadialTextsView.initialize(res, minutesTexts, null, mHideAmPm, false, typeface);
 
         // Initialize the currently-selected hour and minute.
         setValueForItem(HOUR_INDEX, initialHoursOfDay);

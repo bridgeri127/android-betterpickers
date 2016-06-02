@@ -60,13 +60,18 @@ public class AmPmCirclesView extends View {
     private int mAmPmYCenter;
     private int mAmOrPm;
     private int mAmOrPmPressed;
+    private Typeface mTypeface;
 
     public AmPmCirclesView(Context context) {
         super(context);
         mIsInitialized = false;
     }
 
-    public void initialize(Context context, int amOrPm) {
+    public void initialize(Context context, int mAmOrPm) {
+        initialize(context, mAmOrPm, null);
+    }
+
+    public void initialize(Context context, int amOrPm, Typeface typeface) {
         if (mIsInitialized) {
             Log.e(TAG, "AmPmCirclesView may only be initialized once.");
             return;
@@ -76,9 +81,15 @@ public class AmPmCirclesView extends View {
         mUnselectedColor = res.getColor(R.color.bpWhite);
         mSelectedColor = res.getColor(R.color.bpBlue);
         mAmPmTextColor = res.getColor(R.color.ampm_text_color);
-        String typefaceFamily = res.getString(R.string.sans_serif);
-        Typeface tf = Typeface.create(typefaceFamily, Typeface.NORMAL);
-        mPaint.setTypeface(tf);
+
+        // Set typeface to given value or to default value if none is provided
+        if (typeface != null) {
+            mTypeface = typeface;
+        } else {
+            String typefaceFamily = res.getString(R.string.sans_serif);
+            mTypeface = Typeface.create(typefaceFamily, Typeface.NORMAL);
+        }
+        mPaint.setTypeface(mTypeface);
         mPaint.setAntiAlias(true);
         mPaint.setTextAlign(Align.CENTER);
 
