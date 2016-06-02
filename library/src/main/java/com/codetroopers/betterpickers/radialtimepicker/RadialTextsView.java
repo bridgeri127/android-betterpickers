@@ -87,9 +87,6 @@ public class RadialTextsView extends View {
     public RadialTextsView(Context context) {
         super(context);
         mIsInitialized = false;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            setLayerType(LAYER_TYPE_SOFTWARE, null);
-        }
     }
 
     public void initialize(Resources res, String[] texts, String[] innerTexts,
