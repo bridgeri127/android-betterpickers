@@ -25,6 +25,7 @@ import android.graphics.Paint.Align;
 import android.graphics.Path;
 import android.graphics.Region;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
@@ -86,6 +87,9 @@ public class RadialTextsView extends View {
     public RadialTextsView(Context context) {
         super(context);
         mIsInitialized = false;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            setLayerType(LAYER_TYPE_SOFTWARE, null);
+        }
     }
 
     public void initialize(Resources res, String[] texts, String[] innerTexts,
@@ -290,29 +294,28 @@ public class RadialTextsView extends View {
         mPaint.setTextSize(textSize);
         mPaint.setTypeface(typeface);
 
-        for (int i = 0; i < texts.length; i++) {
+        canvas.save();
 
-            canvas.save();
-
-            if (mSelectorPath != null) {
-                if (showSelectionContrast) {
-                    mPaint.setColor(mSelectedTextColor);
-                    canvas.clipPath(mSelectorPath, Region.Op.REPLACE);
-                } else {
-                    mPaint.setColor(mNumbersTextColor);
-                    canvas.clipPath(mSelectorPath, Region.Op.XOR);
-                }
+        if (mSelectorPath != null) {
+            if (showSelectionContrast) {
+                mPaint.setColor(mSelectedTextColor);
+                canvas.clipPath(mSelectorPath, Region.Op.REPLACE);
             } else {
                 mPaint.setColor(mNumbersTextColor);
+                canvas.clipPath(mSelectorPath, Region.Op.XOR);
             }
+        } else {
+            mPaint.setColor(mNumbersTextColor);
+        }
 
+        for (int i = 0; i < texts.length; i++) {
 
             if (texts.length == textGridHeights.length && textGridHeights.length == textGridWidths.length) {
                 canvas.drawText(texts[i], textGridWidths[i], textGridHeights[i], mPaint);
             }
-
-            canvas.restore();
         }
+
+        canvas.restore();
 
         if (showSelectionContrast) {
             drawTexts(canvas, textSize, typeface, texts, textGridWidths, textGridHeights, false);
@@ -374,8 +377,10 @@ public class RadialTextsView extends View {
      * @param selectorPath the Path to set
      */
     public void setSelection(Path selectorPath) {
-        mSelectorPath = selectorPath;
-        invalidate();
+
+            mSelectorPath = selectorPath;
+            invalidate();
+
     }
 
     public ObjectAnimator getDisappearAnimator() {
