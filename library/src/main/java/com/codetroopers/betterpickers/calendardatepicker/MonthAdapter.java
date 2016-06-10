@@ -19,6 +19,7 @@ package com.codetroopers.betterpickers.calendardatepicker;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Typeface;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
@@ -50,9 +51,16 @@ public abstract class MonthAdapter extends BaseAdapter implements OnDayClickList
 
     protected static int WEEK_7_OVERHANG_HEIGHT = 7;
     protected static final int MONTHS_IN_YEAR = 12;
+    private Typeface mRegularTypeface;
+    private Typeface mBoldTypeface;
+    private boolean mHighlightToday;
 
     public void setThemeDark(TypedArray mThemeColors) {
         this.mThemeColors = mThemeColors;
+    }
+
+    public void shouldHighlightToday(boolean highlightToday) {
+        mHighlightToday = highlightToday;
     }
 
     /**
@@ -251,6 +259,7 @@ public abstract class MonthAdapter extends BaseAdapter implements OnDayClickList
         } else {
             v = createMonthView(mContext);
             v.setTheme(mThemeColors);
+            v.shouldHighlightToday(mHighlightToday);
             // Set up the new view
             LayoutParams params = new LayoutParams(
                     LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
@@ -288,6 +297,14 @@ public abstract class MonthAdapter extends BaseAdapter implements OnDayClickList
             v.setDisabledDays(mController.getDisabledDays());
         }
 
+        if (mRegularTypeface != null) {
+            v.setRegularTypeface(mRegularTypeface);
+        }
+
+        if (mBoldTypeface != null) {
+            v.setBoldTypeface(mBoldTypeface);
+        }
+
         drawingParams.put(MonthView.VIEW_PARAMS_SELECTED_DAY, selectedDay);
         drawingParams.put(MonthView.VIEW_PARAMS_YEAR, year);
         drawingParams.put(MonthView.VIEW_PARAMS_MONTH, month);
@@ -297,6 +314,18 @@ public abstract class MonthAdapter extends BaseAdapter implements OnDayClickList
         v.setMonthParams(drawingParams);
         v.invalidate();
         return v;
+    }
+
+    public void setBoldTypeface(Typeface boldTypeface) {
+        if (boldTypeface != null) {
+            mBoldTypeface = boldTypeface;
+        }
+    }
+
+    public void setRegularTypeface(Typeface regularTypeface) {
+        if (regularTypeface != null) {
+            mRegularTypeface = regularTypeface;
+        }
     }
 
     public abstract MonthView createMonthView(Context context);
@@ -315,8 +344,7 @@ public abstract class MonthAdapter extends BaseAdapter implements OnDayClickList
 
     @Override
     public void onDayClick(MonthView view, CalendarDay day) {
-        if (day != null && isDayInRange(day)
-                && !isDayDisabled(day)) {
+        if (day != null && isDayInRange(day) && !isDayDisabled(day)) {
             onDayTapped(day);
         }
     }

@@ -22,6 +22,8 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Paint.Align;
 import android.graphics.Paint.Style;
+import android.support.annotation.ColorInt;
+import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.widget.TextView;
 
@@ -32,20 +34,26 @@ import com.codetroopers.betterpickers.R;
  */
 public class TextViewWithCircularIndicator extends TextView {
 
-    private static final int SELECTED_CIRCLE_ALPHA = 60;
+    private static final String TAG = TextViewWithCircularIndicator.class.getSimpleName();
+
+    public static final int SELECTED_CIRCLE_ALPHA = 60;
+    private static final int ALPHA_MAX_VALUE = 255;
 
     Paint mCirclePaint = new Paint();
 
     private final int mRadius;
     private int mCircleColor;
     private final String mItemIsSelectedText;
+    private int mSelectedTextColor;
+
+    private int mSelectionAlpha;
 
     private boolean mDrawCircle;
 
     public TextViewWithCircularIndicator(Context context, AttributeSet attrs) {
         super(context, attrs);
         Resources res = context.getResources();
-        mCircleColor = res.getColor(R.color.bpBlue);
+        mCircleColor = ContextCompat.getColor(context, R.color.bpBlue);
         mRadius = res.getDimensionPixelOffset(R.dimen.month_select_circle_radius);
         mItemIsSelectedText = context.getResources().getString(R.string.item_is_selected);
 
@@ -58,7 +66,7 @@ public class TextViewWithCircularIndicator extends TextView {
         mCirclePaint.setColor(mCircleColor);
         mCirclePaint.setTextAlign(Align.CENTER);
         mCirclePaint.setStyle(Style.FILL);
-        mCirclePaint.setAlpha(SELECTED_CIRCLE_ALPHA);
+        mCirclePaint.setAlpha(mSelectionAlpha);
     }
 
     public void setCircleColor(int circleColor) {
@@ -70,15 +78,26 @@ public class TextViewWithCircularIndicator extends TextView {
         mDrawCircle = drawCircle;
     }
 
+    public void setCircleAlpha(int alpha) {
+        if (alpha >= 0 && alpha <= ALPHA_MAX_VALUE) {
+            mSelectionAlpha = alpha;
+        }
+    }
+
+    public void setSelectedTextColor(@ColorInt int selectedTextColor) {
+        mSelectedTextColor = selectedTextColor;
+    }
+
     @Override
     public void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
         if (mDrawCircle) {
             final int width = getWidth();
             final int height = getHeight();
             int radius = Math.min(width, height) / 2;
             canvas.drawCircle(width / 2, height / 2, radius, mCirclePaint);
+            setTextColor(mSelectedTextColor);
         }
+        super.onDraw(canvas);
     }
 
     @Override

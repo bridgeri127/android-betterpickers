@@ -28,6 +28,7 @@ import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.accessibility.AccessibilityNodeInfoCompat;
 import android.support.v4.widget.ExploreByTouchHelper;
@@ -135,8 +136,8 @@ public abstract class MonthView extends View {
     // affects the padding on the sides of this view
     protected int mPadding = 0;
 
-    private String mDayOfWeekTypeface;
-    private String mMonthTitleTypeface;
+    private Typeface mBoldTypeface;
+    private Typeface mRegularTypeface;
 
     protected Paint mMonthNumPaint;
     protected Paint mMonthTitlePaint;
@@ -144,6 +145,7 @@ public abstract class MonthView extends View {
     protected Paint mSelectedCirclePaint;
     protected Paint mDisabledDaySquarePaint;
     protected Paint mMonthDayLabelPaint;
+    protected int mSelectionCircleAlpha;
 
     private final Formatter mFormatter;
     private final StringBuilder mStringBuilder;
@@ -164,6 +166,8 @@ public abstract class MonthView extends View {
     protected int mRowHeight = DEFAULT_HEIGHT;
     // If this view contains the today
     protected boolean mHasToday = false;
+    // If today's date should be highlighted
+    protected boolean mHighlightToday;
     // Which day is selected [0-6] or -1 if no day is selected
     protected int mSelectedDay = -1;
     // Which days are disabled in the view so that they are unselectable
@@ -201,6 +205,7 @@ public abstract class MonthView extends View {
     protected int mDisabledDayColor;
     protected int mMonthTitleColor;
     protected int mMonthTitleBGColor;
+    protected int mSelectedTextColor;
 
     public MonthView(Context context) {
         super(context);
@@ -209,8 +214,8 @@ public abstract class MonthView extends View {
         mDayLabelCalendar = Calendar.getInstance();
         mCalendar = Calendar.getInstance();
 
-        mDayOfWeekTypeface = res.getString(R.string.day_of_week_label_typeface);
-        mMonthTitleTypeface = res.getString(R.string.sans_serif);
+        mBoldTypeface = Typeface.create(res.getString(R.string.day_of_week_label_typeface), Typeface.BOLD);
+        mRegularTypeface = Typeface.create(res.getString(R.string.sans_serif), Typeface.NORMAL);
 
         mDayTextColorEnabled = res.getColor(R.color.date_picker_text_normal);
         mDayTextColorDisabled = res.getColor(R.color.date_picker_text_disabled);
@@ -242,13 +247,19 @@ public abstract class MonthView extends View {
     }
 
     public void setTheme(TypedArray themeColors) {
-        mMonthTitleBGColor = themeColors.getColor(R.styleable.BetterPickersDialog_bpMainColor2, R.color.circle_background);
-        mTodayNumberColor = themeColors.getColor(R.styleable.BetterPickersDialog_bpAccentColor, R.color.bpBlue);
-        mDisabledDayColor = themeColors.getColor(R.styleable.BetterPickersDialog_bpDisabledDayColor, R.color.bpDarker_red);
-        mDayTextColorDisabled = themeColors.getColor(R.styleable.BetterPickersDialog_bpDisabledDayTextColor, R.color.ampm_text_color);
-        mMonthTitleColor = themeColors.getColor(R.styleable.BetterPickersDialog_bpMainTextColor, R.color.ampm_text_color);
+        mMonthTitleBGColor = themeColors.getColor(R.styleable.BetterPickersDialog_bpMainColor2, ContextCompat.getColor(getContext(), R.color.circle_background));
+        mTodayNumberColor = themeColors.getColor(R.styleable.BetterPickersDialog_bpAccentColor, ContextCompat.getColor(getContext(), R.color.bpBlue));
+        mDisabledDayColor = themeColors.getColor(R.styleable.BetterPickersDialog_bpDisabledDayColor, ContextCompat.getColor(getContext(), R.color.bpDarker_red));
+        mDayTextColorDisabled = themeColors.getColor(R.styleable.BetterPickersDialog_bpDisabledDayTextColor, ContextCompat.getColor(getContext(), R.color.ampm_text_color));
+        mMonthTitleColor = themeColors.getColor(R.styleable.BetterPickersDialog_bpMainTextColor, ContextCompat.getColor(getContext(), R.color.ampm_text_color));
+        mSelectionCircleAlpha = themeColors.getInt(R.styleable.BetterPickersDialog_bpSelectionAlpha, SELECTED_CIRCLE_ALPHA);
+        mSelectedTextColor = themeColors.getColor(R.styleable.BetterPickersDialog_bpContrastTextColor, ContextCompat.getColor(getContext(), R.color.bpWhite));
 
         initView();
+    }
+
+    public void shouldHighlightToday(boolean highlightToday) {
+        mHighlightToday = highlightToday;
     }
 
     @Override
@@ -295,7 +306,7 @@ public abstract class MonthView extends View {
         mMonthTitlePaint.setFakeBoldText(true);
         mMonthTitlePaint.setAntiAlias(true);
         mMonthTitlePaint.setTextSize(MONTH_LABEL_TEXT_SIZE);
-        mMonthTitlePaint.setTypeface(Typeface.create(mMonthTitleTypeface, Typeface.BOLD));
+        mMonthTitlePaint.setTypeface(mBoldTypeface);
         mMonthTitlePaint.setColor(mDayTextColorEnabled);
         mMonthTitlePaint.setTextAlign(Align.CENTER);
         mMonthTitlePaint.setStyle(Style.FILL);
@@ -313,7 +324,7 @@ public abstract class MonthView extends View {
         mSelectedCirclePaint.setColor(mTodayNumberColor);
         mSelectedCirclePaint.setTextAlign(Align.CENTER);
         mSelectedCirclePaint.setStyle(Style.FILL);
-        mSelectedCirclePaint.setAlpha(SELECTED_CIRCLE_ALPHA);
+        mSelectedCirclePaint.setAlpha(mSelectionCircleAlpha);
 
         mDisabledDaySquarePaint = new Paint();
         mDisabledDaySquarePaint.setFakeBoldText(true);
@@ -327,7 +338,7 @@ public abstract class MonthView extends View {
         mMonthDayLabelPaint.setAntiAlias(true);
         mMonthDayLabelPaint.setTextSize(MONTH_DAY_LABEL_TEXT_SIZE);
         mMonthDayLabelPaint.setColor(mDayTextColorEnabled);
-        mMonthDayLabelPaint.setTypeface(Typeface.create(mDayOfWeekTypeface, Typeface.NORMAL));
+        mMonthDayLabelPaint.setTypeface(mRegularTypeface);
         mMonthDayLabelPaint.setStyle(Style.FILL);
         mMonthDayLabelPaint.setTextAlign(Align.CENTER);
         mMonthDayLabelPaint.setFakeBoldText(true);
@@ -464,6 +475,18 @@ public abstract class MonthView extends View {
         canvas.drawText(getMonthAndYearString(), x, y, mMonthTitlePaint);
     }
 
+    public void setRegularTypeface(Typeface regularTypeface) {
+        if (regularTypeface != null) {
+            mRegularTypeface = regularTypeface;
+        }
+    }
+
+    public void setBoldTypeface(Typeface boldTypeface) {
+        if (boldTypeface != null) {
+            mBoldTypeface = boldTypeface;
+        }
+    }
+
     private void drawMonthDayLabels(Canvas canvas) {
         int y = MONTH_HEADER_SIZE - (MONTH_DAY_LABEL_TEXT_SIZE / 2);
         int dayWidthHalf = (mWidth - mPadding * 2) / (mNumDays * 2);
@@ -534,8 +557,8 @@ public abstract class MonthView extends View {
      * @param stopY     The bottom boundary of the day number rect
      * @param isEnabled The flag to show if the day should look enabled or not
      */
-    public abstract void drawMonthDay(Canvas canvas, int year, int month, int day,
-                                      int x, int y, int startX, int stopX, int startY, int stopY, boolean isEnabled);
+    public abstract void drawMonthDay(Canvas canvas, int year, int month, int day, int x, int y, int startX,
+                                      int stopX, int startY, int stopY, boolean isEnabled);
 
     private int findDayOffset() {
         return (mDayOfWeekStart < mWeekStart ? (mDayOfWeekStart + mNumDays) : mDayOfWeekStart)

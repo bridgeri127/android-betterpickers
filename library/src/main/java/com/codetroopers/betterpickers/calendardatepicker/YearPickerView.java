@@ -19,7 +19,9 @@ package com.codetroopers.betterpickers.calendardatepicker;
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
+import android.graphics.Typeface;
 import android.graphics.drawable.StateListDrawable;
+import android.os.Build;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.accessibility.AccessibilityEvent;
@@ -51,11 +53,17 @@ public class YearPickerView extends ListView implements OnItemClickListener, OnD
     private int mTextColor;
     private int mCircleColor;
     private int mBackgroundColor;
+    private int mSelectedTextColor;
+
+    private int mSelectionAlpha;
+    private Typeface mTypeface;
 
     public void setTheme(TypedArray themeColors) {
         mBackgroundColor = themeColors.getColor(R.styleable.BetterPickersDialog_bpMainColor2, R.color.circle_background);
         mCircleColor = themeColors.getColor(R.styleable.BetterPickersDialog_bpAccentColor, R.color.bpBlue);
         mTextColor = themeColors.getColor(R.styleable.BetterPickersDialog_bpMainTextColor, R.color.ampm_text_color);
+        mSelectionAlpha = themeColors.getInt(R.styleable.BetterPickersDialog_bpSelectionAlpha, TextViewWithCircularIndicator.SELECTED_CIRCLE_ALPHA);
+        mSelectedTextColor = themeColors.getInt(R.styleable.BetterPickersDialog_bpContrastTextColor, R.color.bpWhite);
     }
 
     /**
@@ -116,6 +124,10 @@ public class YearPickerView extends ListView implements OnItemClickListener, OnD
         return Integer.valueOf(view.getText().toString());
     }
 
+    public void setTypeface(Typeface typeface) {
+        this.mTypeface = typeface;
+    }
+
     private class YearAdapter extends ArrayAdapter<String> {
 
         public YearAdapter(Context context, int resource, List<String> objects) {
@@ -132,6 +144,9 @@ public class YearPickerView extends ListView implements OnItemClickListener, OnD
             v.setBackgroundColor(mBackgroundColor);
             v.setCircleColor(mCircleColor);
             v.setTextColor(mTextColor);
+            v.setCircleAlpha(mSelectionAlpha);
+            v.setSelectedTextColor(mSelectedTextColor);
+            v.setTypeface(mTypeface);
             boolean selected = mController.getSelectedDay().year == year;
             v.drawIndicator(selected);
             if (selected) {
@@ -175,7 +190,9 @@ public class YearPickerView extends ListView implements OnItemClickListener, OnD
         super.onInitializeAccessibilityEvent(event);
         if (event.getEventType() == AccessibilityEvent.TYPE_VIEW_SCROLLED) {
             event.setFromIndex(0);
-            event.setToIndex(0);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+                event.setToIndex(0);
+            }
         }
     }
 }

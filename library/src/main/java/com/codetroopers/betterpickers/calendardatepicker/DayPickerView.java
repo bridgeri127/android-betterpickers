@@ -19,6 +19,7 @@ package com.codetroopers.betterpickers.calendardatepicker;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -91,6 +92,9 @@ public abstract class DayPickerView extends ListView implements OnScrollListener
 
     private CalendarDatePickerController mController;
     private boolean mPerformingScroll;
+    private Typeface mRegularTypeface;
+    private Typeface mBoldTypeface;
+    private boolean mHighlightToday;
 
     public DayPickerView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -98,7 +102,12 @@ public abstract class DayPickerView extends ListView implements OnScrollListener
     }
 
     public DayPickerView(Context context, CalendarDatePickerController controller) {
+        this(context, controller, false);
+    }
+
+    public DayPickerView(Context context, CalendarDatePickerController controller, boolean highlightToday) {
         super(context);
+        mHighlightToday = highlightToday;
         init(context);
         setController(controller);
     }
@@ -130,11 +139,30 @@ public abstract class DayPickerView extends ListView implements OnScrollListener
     protected void refreshAdapter() {
         if (mAdapter == null) {
             mAdapter = createMonthAdapter(getContext(), mController);
+            mAdapter.shouldHighlightToday(mHighlightToday);
+            if (mRegularTypeface != null) {
+                mAdapter.setRegularTypeface(mRegularTypeface);
+            }
+            if (mBoldTypeface != null) {
+                mAdapter.setBoldTypeface(mBoldTypeface);
+            }
         } else {
             mAdapter.setSelectedDay(mSelectedDay);
         }
         // refresh the view with the new parameters
         setAdapter(mAdapter);
+    }
+
+    public void setRegularTypeface(Typeface regularTypeface) {
+        if (regularTypeface != null) {
+            mRegularTypeface = regularTypeface;
+        }
+    }
+
+    public void setBoldTypeface(Typeface boldTypeface) {
+        if (boldTypeface != null) {
+            mBoldTypeface = boldTypeface;
+        }
     }
 
     public abstract MonthAdapter createMonthAdapter(Context context,
@@ -168,7 +196,7 @@ public abstract class DayPickerView extends ListView implements OnScrollListener
      * the first of the month containing the time is at the top of the view. If the new time is already in view the list
      * will not be scrolled unless forceScroll is true. This time may optionally be highlighted as selected as well.
      *
-     * @param time The time to move to
+     * @param day The day to move to
      * @param animate Whether to scroll to the given time or just redraw at the new location
      * @param setSelected Whether to set the given time as selected
      * @param forceScroll Whether to recenter even if the time is already visible

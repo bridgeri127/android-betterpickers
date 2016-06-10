@@ -32,6 +32,10 @@ public class SimpleDayPickerView extends DayPickerView {
         super(context, controller);
     }
 
+    public SimpleDayPickerView(Context context, CalendarDatePickerController controller, boolean highlightToday) {
+        super(context, controller, highlightToday);
+    }
+
     @Override
     public MonthAdapter createMonthAdapter(Context context, CalendarDatePickerController controller) {
         return new SimpleMonthAdapter(context, controller);

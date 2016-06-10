@@ -281,7 +281,7 @@ public class RadialTimePickerDialogFragment extends DialogFragment implements On
         return this;
     }
 
-    public RadialTimePickerDialogFragment setTypeFace(Typeface typeFace) {
+    public RadialTimePickerDialogFragment setTypeface(Typeface typeFace) {
         mTypeFace = typeFace;
         return this;
     }
