@@ -102,11 +102,14 @@ public abstract class DayPickerView extends ListView implements OnScrollListener
     }
 
     public DayPickerView(Context context, CalendarDatePickerController controller) {
-        this(context, controller, false);
+        this(context, controller, false, null);
     }
 
-    public DayPickerView(Context context, CalendarDatePickerController controller, boolean highlightToday) {
+    public DayPickerView(Context context, CalendarDatePickerController controller, boolean highlightToday, Typeface typeface) {
         super(context);
+        if (typeface != null) {
+            mRegularTypeface = typeface;
+        }
         mHighlightToday = highlightToday;
         init(context);
         setController(controller);
@@ -156,12 +159,14 @@ public abstract class DayPickerView extends ListView implements OnScrollListener
     public void setRegularTypeface(Typeface regularTypeface) {
         if (regularTypeface != null) {
             mRegularTypeface = regularTypeface;
+            mAdapter.setRegularTypeface(regularTypeface);
         }
     }
 
     public void setBoldTypeface(Typeface boldTypeface) {
         if (boldTypeface != null) {
             mBoldTypeface = boldTypeface;
+            mAdapter.setBoldTypeface(boldTypeface);
         }
     }
 

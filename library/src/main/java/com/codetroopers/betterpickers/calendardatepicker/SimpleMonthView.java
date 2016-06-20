@@ -18,6 +18,7 @@ package com.codetroopers.betterpickers.calendardatepicker;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Typeface;
 
 import com.codetroopers.betterpickers.Utils;
 
@@ -29,6 +30,10 @@ public class SimpleMonthView extends MonthView {
 
     public SimpleMonthView(Context context) {
         super(context);
+    }
+
+    public SimpleMonthView(Context context, Typeface regularTypeface, Typeface boldTypeface) {
+        super(context, regularTypeface, boldTypeface);
     }
 
     @Override

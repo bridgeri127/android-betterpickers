@@ -32,6 +32,7 @@ import android.widget.BaseAdapter;
 import com.codetroopers.betterpickers.Utils;
 import com.codetroopers.betterpickers.calendardatepicker.MonthView.OnDayClickListener;
 
+import java.lang.reflect.Type;
 import java.util.Calendar;
 import java.util.HashMap;
 
@@ -257,7 +258,7 @@ public abstract class MonthAdapter extends BaseAdapter implements OnDayClickList
             // We store the drawing parameters in the view so it can be recycled
             drawingParams = (HashMap<String, Integer>) v.getTag();
         } else {
-            v = createMonthView(mContext);
+            v = createMonthView(mContext, mRegularTypeface, mBoldTypeface);
             v.setTheme(mThemeColors);
             v.shouldHighlightToday(mHighlightToday);
             // Set up the new view
@@ -268,7 +269,7 @@ public abstract class MonthAdapter extends BaseAdapter implements OnDayClickList
             v.setOnDayClickListener(this);
         }
         if (drawingParams == null) {
-            drawingParams = new HashMap<String, Integer>();
+            drawingParams = new HashMap<>();
         }
         drawingParams.clear();
 
@@ -330,6 +331,8 @@ public abstract class MonthAdapter extends BaseAdapter implements OnDayClickList
 
     public abstract MonthView createMonthView(Context context);
 
+    public abstract MonthView createMonthView(Context context, Typeface regularTypeface, Typeface boldTypeface);
+
     private boolean isSelectedDayInMonth(int year, int month) {
         return mSelectedDay.year == year && mSelectedDay.month == month;
     }
@@ -354,11 +357,7 @@ public abstract class MonthAdapter extends BaseAdapter implements OnDayClickList
     }
 
     private boolean isDayDisabled(CalendarDay day) {
-        if (mController.getDisabledDays() == null) {
-            return false;
-        }
-        return mController.getDisabledDays()
-                .indexOfKey(Utils.formatDisabledDayForKey(day.year, day.month, day.day)) >= 0;
+        return mController.getDisabledDays() != null && mController.getDisabledDays().indexOfKey(Utils.formatDisabledDayForKey(day.year, day.month, day.day)) >= 0;
     }
 
     /**

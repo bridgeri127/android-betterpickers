@@ -208,14 +208,26 @@ public abstract class MonthView extends View {
     protected int mSelectedTextColor;
 
     public MonthView(Context context) {
+        this(context, null, null);
+    }
+
+    public MonthView(Context context, Typeface regularTypeface, Typeface boldTypeface) {
         super(context);
         Resources res = context.getResources();
 
         mDayLabelCalendar = Calendar.getInstance();
         mCalendar = Calendar.getInstance();
 
-        mBoldTypeface = Typeface.create(res.getString(R.string.day_of_week_label_typeface), Typeface.BOLD);
-        mRegularTypeface = Typeface.create(res.getString(R.string.sans_serif), Typeface.NORMAL);
+        if (regularTypeface != null) {
+            mRegularTypeface = regularTypeface;
+        } else {
+            mRegularTypeface = Typeface.create(res.getString(R.string.sans_serif), Typeface.NORMAL);
+        }
+        if (boldTypeface != null) {
+            mBoldTypeface = boldTypeface;
+        } else {
+            mBoldTypeface = Typeface.create(res.getString(R.string.day_of_week_label_typeface), Typeface.BOLD);
+        }
 
         mDayTextColorEnabled = res.getColor(R.color.date_picker_text_normal);
         mDayTextColorDisabled = res.getColor(R.color.date_picker_text_disabled);
@@ -253,6 +265,7 @@ public abstract class MonthView extends View {
         mDayTextColorDisabled = themeColors.getColor(R.styleable.BetterPickersDialog_bpDisabledDayTextColor, ContextCompat.getColor(getContext(), R.color.ampm_text_color));
         mMonthTitleColor = themeColors.getColor(R.styleable.BetterPickersDialog_bpMainTextColor, ContextCompat.getColor(getContext(), R.color.ampm_text_color));
         mSelectionCircleAlpha = themeColors.getInt(R.styleable.BetterPickersDialog_bpSelectionAlpha, SELECTED_CIRCLE_ALPHA);
+        mDayTextColorEnabled = themeColors.getColor(R.styleable.BetterPickersDialog_bpMainTextColor, ContextCompat.getColor(getContext(), R.color.date_picker_text_normal));
         mSelectedTextColor = themeColors.getColor(R.styleable.BetterPickersDialog_bpContrastTextColor, ContextCompat.getColor(getContext(), R.color.bpWhite));
 
         initView();
@@ -345,6 +358,7 @@ public abstract class MonthView extends View {
 
         mMonthNumPaint = new Paint();
         mMonthNumPaint.setAntiAlias(true);
+        mMonthNumPaint.setTypeface(mRegularTypeface);
         mMonthNumPaint.setTextSize(MINI_DAY_NUMBER_TEXT_SIZE);
         mMonthNumPaint.setStyle(Style.FILL);
         mMonthNumPaint.setTextAlign(Align.CENTER);

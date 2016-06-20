@@ -314,7 +314,7 @@ public class CalendarDatePickerDialogFragment extends DialogFragment implements 
         }
 
         final Activity activity = getActivity();
-        mDayPickerView = new SimpleDayPickerView(activity, this, mHighlightToday);
+        mDayPickerView = new SimpleDayPickerView(activity, this, mHighlightToday, mRegularTypeface);
         mYearPickerView = new YearPickerView(activity, this);
         if (mRegularTypeface != null) {
             mDayPickerView.setRegularTypeface(mRegularTypeface);

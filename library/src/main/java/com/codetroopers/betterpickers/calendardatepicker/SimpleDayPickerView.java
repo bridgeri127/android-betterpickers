@@ -17,6 +17,7 @@
 package com.codetroopers.betterpickers.calendardatepicker;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.util.AttributeSet;
 
 /**
@@ -33,7 +34,11 @@ public class SimpleDayPickerView extends DayPickerView {
     }
 
     public SimpleDayPickerView(Context context, CalendarDatePickerController controller, boolean highlightToday) {
-        super(context, controller, highlightToday);
+        super(context, controller, highlightToday, null);
+    }
+
+    public SimpleDayPickerView(Context context, CalendarDatePickerController controller, boolean highlightToday, Typeface typeface) {
+        super(context, controller, highlightToday, typeface);
     }
 
     @Override

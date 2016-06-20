@@ -17,6 +17,7 @@
 package com.codetroopers.betterpickers.calendardatepicker;
 
 import android.content.Context;
+import android.graphics.Typeface;
 
 /**
  * An adapter for a list of {@link SimpleMonthView} items.
@@ -30,5 +31,10 @@ public class SimpleMonthAdapter extends MonthAdapter {
     @Override
     public MonthView createMonthView(Context context) {
         return new SimpleMonthView(context);
+    }
+
+    @Override
+    public MonthView createMonthView(Context context, Typeface regularTypeface, Typeface boldTypeface) {
+        return new SimpleMonthView(context, regularTypeface, boldTypeface);
     }
 }
