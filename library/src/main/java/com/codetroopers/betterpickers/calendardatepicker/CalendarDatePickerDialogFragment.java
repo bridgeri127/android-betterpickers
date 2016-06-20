@@ -58,73 +58,73 @@ import java.util.Locale;
  */
 public class CalendarDatePickerDialogFragment extends DialogFragment implements OnClickListener, CalendarDatePickerController {
 
-    private static final String TAG = "DatePickerDialog";
+    protected static final String TAG = "DatePickerDialog";
 
-    private static final int UNINITIALIZED = -1;
-    private static final int MONTH_AND_DAY_VIEW = 0;
-    private static final int YEAR_VIEW = 1;
+    protected static final int UNINITIALIZED = -1;
+    protected static final int MONTH_AND_DAY_VIEW = 0;
+    protected static final int YEAR_VIEW = 1;
 
-    private static final String KEY_SELECTED_YEAR = "year";
-    private static final String KEY_SELECTED_MONTH = "month";
-    private static final String KEY_SELECTED_DAY = "day";
-    private static final String KEY_LIST_POSITION = "list_position";
-    private static final String KEY_WEEK_START = "week_start";
-    private static final String KEY_DATE_START = "date_start";
-    private static final String KEY_DATE_END = "date_end";
-    private static final String KEY_CURRENT_VIEW = "current_view";
-    private static final String KEY_LIST_POSITION_OFFSET = "list_position_offset";
-    private static final String KEY_THEME = "theme";
-    private static final String KEY_DISABLED_DAYS = "disabled_days";
+    protected static final String KEY_SELECTED_YEAR = "year";
+    protected static final String KEY_SELECTED_MONTH = "month";
+    protected static final String KEY_SELECTED_DAY = "day";
+    protected static final String KEY_LIST_POSITION = "list_position";
+    protected static final String KEY_WEEK_START = "week_start";
+    protected static final String KEY_DATE_START = "date_start";
+    protected static final String KEY_DATE_END = "date_end";
+    protected static final String KEY_CURRENT_VIEW = "current_view";
+    protected static final String KEY_LIST_POSITION_OFFSET = "list_position_offset";
+    protected static final String KEY_THEME = "theme";
+    protected static final String KEY_DISABLED_DAYS = "disabled_days";
 
-    private static final CalendarDay DEFAULT_START_DATE = new CalendarDay(1900, Calendar.JANUARY, 1);
-    private static final CalendarDay DEFAULT_END_DATE = new CalendarDay(2100, Calendar.DECEMBER, 31);
+    protected static final CalendarDay DEFAULT_START_DATE = new CalendarDay(1900, Calendar.JANUARY, 1);
+    protected static final CalendarDay DEFAULT_END_DATE = new CalendarDay(2100, Calendar.DECEMBER, 31);
 
-    private static final int ANIMATION_DURATION = 300;
-    private static final int ANIMATION_DELAY = 500;
+    protected static final int ANIMATION_DURATION = 300;
+    protected static final int ANIMATION_DELAY = 500;
 
-    private static final SimpleDateFormat YEAR_FORMAT = new SimpleDateFormat("yyyy", Locale.getDefault());
-    private static final SimpleDateFormat DAY_FORMAT = new SimpleDateFormat("dd", Locale.getDefault());
+    protected static final SimpleDateFormat YEAR_FORMAT = new SimpleDateFormat("yyyy", Locale.getDefault());
+    protected static final SimpleDateFormat DAY_FORMAT = new SimpleDateFormat("dd", Locale.getDefault());
 
-    private final Calendar mCalendar = Calendar.getInstance();
-    private OnDateSetListener mCallBack;
-    private OnDialogDismissListener mDimissCallback;
+    protected final Calendar mCalendar = Calendar.getInstance();
+    protected OnDateSetListener mCallBack;
+    protected OnDialogDismissListener mDimissCallback;
 
-    private HashSet<OnDateChangedListener> mListeners = new HashSet<OnDateChangedListener>();
+    protected HashSet<OnDateChangedListener> mListeners = new HashSet<>();
 
-    private AccessibleDateAnimator mAnimator;
-    private LinearLayout mSelectedDateLayout;
-    private TextView mDayOfWeekView;
-    private LinearLayout mMonthAndDayView;
-    private TextView mSelectedMonthTextView;
-    private TextView mSelectedDayTextView;
-    private TextView mYearView;
-    private DayPickerView mDayPickerView;
-    private YearPickerView mYearPickerView;
+    protected AccessibleDateAnimator mAnimator;
+    protected LinearLayout mSelectedDateLayout;
+    protected TextView mDayOfWeekView;
+    protected LinearLayout mMonthAndDayView;
+    protected TextView mSelectedMonthTextView;
+    protected TextView mSelectedDayTextView;
+    protected TextView mYearView;
+    protected DayPickerView mDayPickerView;
+    protected YearPickerView mYearPickerView;
 
-    private int mCurrentView = UNINITIALIZED;
-    private int mWeekStart = mCalendar.getFirstDayOfWeek();
-    private CalendarDay mMinDate = DEFAULT_START_DATE;
-    private CalendarDay mMaxDate = DEFAULT_END_DATE;
-    private String mDoneText;
-    private String mCancelText;
+    protected int mCurrentView = UNINITIALIZED;
+    protected int mWeekStart = mCalendar.getFirstDayOfWeek();
+    protected CalendarDay mMinDate = DEFAULT_START_DATE;
+    protected CalendarDay mMaxDate = DEFAULT_END_DATE;
+    protected String mDoneText;
+    protected String mCancelText;
 
-    private SparseArray<CalendarDay> mDisabledDays;
+    protected SparseArray<CalendarDay> mDisabledDays;
 
-    private HapticFeedbackController mHapticFeedbackController;
+    protected HapticFeedbackController mHapticFeedbackController;
 
-    private boolean mDelayAnimation = true;
+    protected boolean mDelayAnimation = true;
     // Accessibility strings.
-    private String mDayPickerDescription;
-    private String mSelectDay;
-    private String mYearPickerDescription;
-    private String mSelectYear;
-    private Typeface mBoldTypeface;
-    private Typeface mRegularTypeface;
+    protected String mDayPickerDescription;
+    protected String mSelectDay;
+    protected String mYearPickerDescription;
+    protected String mSelectYear;
+    protected Typeface mBoldTypeface;
+    protected Typeface mRegularTypeface;
 
-    private int mStyleResId;
-    private int mSelectedColor;
-    private int mUnselectedColor;
-    private boolean mHighlightToday = true;
+    protected int mStyleResId;
+    protected int mSelectedColor;
+    protected int mUnselectedColor;
+    protected boolean mHighlightToday = true;
 
     /**
      * The callback used to indicate the user is done filling in the date.
@@ -145,12 +145,12 @@ public class CalendarDatePickerDialogFragment extends DialogFragment implements 
      */
     public interface OnDateChangedListener {
 
-        public void onDateChanged();
+        void onDateChanged();
     }
 
-    public static interface OnDialogDismissListener {
+    public interface OnDialogDismissListener {
 
-        public abstract void onDialogDismiss(DialogInterface dialoginterface);
+        void onDialogDismiss(DialogInterface dialoginterface);
     }
 
     public CalendarDatePickerDialogFragment() {
@@ -426,7 +426,7 @@ public class CalendarDatePickerDialogFragment extends DialogFragment implements 
         mHapticFeedbackController.stop();
     }
 
-    private void setCurrentView(final int viewIndex) {
+    protected void setCurrentView(final int viewIndex) {
         long millis = mCalendar.getTimeInMillis();
 
         switch (viewIndex) {
@@ -478,7 +478,7 @@ public class CalendarDatePickerDialogFragment extends DialogFragment implements 
         }
     }
 
-    private void updateDisplay(boolean announce) {
+    protected void updateDisplay(boolean announce) {
         if (mDayOfWeekView != null) {
             mDayOfWeekView.setText(mCalendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG,
                     Locale.getDefault()).toUpperCase(Locale.getDefault()));
@@ -572,7 +572,7 @@ public class CalendarDatePickerDialogFragment extends DialogFragment implements 
     // change the selected day number to the last day of the selected month or year.
     //      e.g. Switching from Mar to Apr when Mar 31 is selected -> Apr 30
     //      e.g. Switching from 2012 to 2013 when Feb 29, 2012 is selected -> Feb 28, 2013
-    private void adjustDayInMonthIfNeeded(int month, int year) {
+    protected void adjustDayInMonthIfNeeded(int month, int year) {
         int day = mCalendar.get(Calendar.DAY_OF_MONTH);
         int daysInMonth = Utils.getDaysInMonth(month, year);
         if (day > daysInMonth) {
@@ -616,7 +616,7 @@ public class CalendarDatePickerDialogFragment extends DialogFragment implements 
         updateDisplay(true);
     }
 
-    private void updatePickers() {
+    protected void updatePickers() {
         Iterator<OnDateChangedListener> iterator = mListeners.iterator();
         while (iterator.hasNext()) {
             iterator.next().onDateChanged();
