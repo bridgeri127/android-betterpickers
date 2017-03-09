@@ -108,6 +108,9 @@ public class CalendarDatePickerDialogFragment extends DialogFragment implements 
     protected String mDoneText;
     protected String mCancelText;
 
+    private OnClickListener mNeutralButtonListener;
+    private String mNeutralButtonText;
+
     protected SparseArray<CalendarDay> mDisabledDays;
 
     protected HapticFeedbackController mHapticFeedbackController;
@@ -379,6 +382,21 @@ public class CalendarDatePickerDialogFragment extends DialogFragment implements 
             }
         });
 
+        Button neutralButton = (Button) view.findViewById(R.id.neutral_button);
+        neutralButton.setVisibility(View.VISIBLE);
+        neutralButton.setTextColor(mSelectedColor);
+        if (mNeutralButtonText != null) {
+            neutralButton.setText(mNeutralButtonText);
+        }
+        if (mNeutralButtonListener != null) {
+            neutralButton.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    mNeutralButtonListener.onClick(view);
+                    dismiss();
+                }
+            });
+        }
 
         updateDisplay(false);
         setCurrentView(currentView);
@@ -621,6 +639,12 @@ public class CalendarDatePickerDialogFragment extends DialogFragment implements 
         while (iterator.hasNext()) {
             iterator.next().onDateChanged();
         }
+    }
+
+    public CalendarDatePickerDialogFragment setNeutralButton(final String text, final OnClickListener listener) {
+        mNeutralButtonText = text;
+        mNeutralButtonListener = listener;
+        return this;
     }
 
 
